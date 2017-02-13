@@ -3,10 +3,15 @@ package id.fikri.dzikirpagipetang.activities;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
+import android.database.Cursor;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.Html;
+import android.transition.Slide;
+import android.transition.TransitionInflater;
 import android.view.View;
 import android.widget.Toast;
 
@@ -25,7 +30,6 @@ import id.fikri.dzikirpagipetang.fragment.MorningFragment;
 public class MainActivity extends AppCompatActivity {
 
     private Drawer result = null;
-    private CollapsingToolbarLayout collapsingToolbarLayout;
 
     private DatabaseHelper myDB;
 
@@ -34,23 +38,26 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        myDB = new DatabaseHelper(this);
+
         // Handle Toolbar
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        getSupportActionBar().setTitle(R.string.app_name);
 
         HomeFragment f = new HomeFragment();
         getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, f).commit();
 
-        collapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
-        collapsingToolbarLayout.setTitle(getString(R.string.app_name));
+
 
         //Create the drawer
         result = new DrawerBuilder(this)
                 //this layout have to contain child layouts
-                .withActivity(this)
+                .withRootView(R.id.drawer_container)
 //                .withAccountHeader(headerResult)
                 .withToolbar(toolbar)
-                .withFullscreen(true)
+                .withDisplayBelowStatusBar(false)
+                .withActionBarDrawerToggleAnimated(true)
                 .addDrawerItems(
                         new PrimaryDrawerItem().withName(R.string.app_name).withIcon(R.mipmap.ic_launcher).withIdentifier(1),
                         new PrimaryDrawerItem().withName(R.string.nav_dzikir_pagi).withIcon(R.mipmap.ic_launcher).withIdentifier(2),
@@ -63,15 +70,15 @@ public class MainActivity extends AppCompatActivity {
                             if (drawerItem.getIdentifier() == 1) {
                                 HomeFragment f = new HomeFragment();
                                 getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, f).commit();
-                                collapsingToolbarLayout.setTitle(getString(R.string.app_name));
+                                getSupportActionBar().setTitle(getString(R.string.nav_home));
                             } else if (drawerItem.getIdentifier() == 2) {
                                 MorningFragment f = new MorningFragment();
                                 getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, f).commit();
-                                collapsingToolbarLayout.setTitle(getString(R.string.nav_dzikir_pagi));
+                                getSupportActionBar().setTitle(getString(R.string.nav_dzikir_pagi));
                             } else if (drawerItem.getIdentifier() == 3) {
                                 EveningFragment f = new EveningFragment();
                                 getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, f).commit();
-                                collapsingToolbarLayout.setTitle(getString(R.string.nav_dzikir_petang));
+                                getSupportActionBar().setTitle(getString(R.string.nav_dzikir_petang));
                             }
                         }
                         return false;
@@ -80,7 +87,33 @@ public class MainActivity extends AppCompatActivity {
                 .withSavedInstance(savedInstanceState)
                 .build();
 
+        SharedPreferences prefs = getPreferences(Context.MODE_PRIVATE);
+        if (prefs.getBoolean("firstLaunch", true)) {
+            prefs.edit().putBoolean("firstLaunch", false).commit();
+            Resources res = getResources();
+            int[] morning_id = {1,2,3,4,5,6,7,8,9,10};
+            String[] morning_judul = {"judul1","judul2","judul3","judul4","judul5","judul6","judul7","judul8","judul9","judul10"};
+            String[] morning_jumlah = {"jumlah1","jumlah2","jumlah3","jumlah4","jumlah5","jumlah6","jumlah7","jumlah8","jumlah9","jumlah10"};
+            String[] morning_arabic = {"1","2","3","4","5","6","7","8","9","10"};
+            String[] morning_terjemah = {"1","2","3","4","5","6","7","8","9","10"};
+            String[] morning_riwayat = {"1","2","3","4","5","6","7","8","9","10"};
+            String[] morning_manfaat = {"1","2","3","4","5","6","7","8","9","10"};
+            int[] morning_media = {1,2,3,4,5,6,7,8,9,10};
 
+            String[] evening_id = {"1","2","3","4","5","6","7","8","9","10"};
+            String[] evening_judul = {"judul1","judul2","judul3","judul4","judul5","judul6","judul7","judul8","judul9","judul10"};
+            String[] evening_jumlah = {"jumlah1","jumlah2","jumlah3","jumlah4","jumlah5","jumlah6","jumlah7","jumlah8","jumlah9","jumlah10"};
+            String[] evening_arabic = {"1","2","3","4","5","6","7","8","9","10"};
+            String[] evening_terjemah = {"1","2","3","4","5","6","7","8","9","10"};
+            String[] evening_riwayat = {"1","2","3","4","5","6","7","8","9","10"};
+            String[] evening_manfaat = {"1","2","3","4","5","6","7","8","9","10"};
+            int[] evening_media = {1,2,3,4,5,6,7,8,9,10};
+
+
+            for (int i = 0; i < morning_id.length; i++) {
+                myDB.insert_table_morning(morning_id[i], morning_judul[i], morning_jumlah[i], morning_arabic[i], morning_terjemah[i], morning_riwayat[i], morning_manfaat[i], morning_media[i]);
+            }
+        }
     }
 
     @Override

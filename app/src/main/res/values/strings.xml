@@ -7,5 +7,7 @@
 
     <string name="nav_dzikir_pagi">Dzikir Pagi</string>
     <string name="nav_dzikir_petang">Dzikir Petang</string>
+    <string name="nav_home">Home</string>
+    <string name="title_activity_morning">MorningActivity</string>
 
 </resources>
